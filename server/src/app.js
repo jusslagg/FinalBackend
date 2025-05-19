@@ -3,8 +3,8 @@ import config from './config/config.js';
 import userRouter from './routes/user.router.js';
 import { current } from './middleware/current.middleware.js';
 import orderRouter from './routes/order.router.js';
-import businessRouter from './routes/business.router.js';
 import connectDB from './config/db.config.js';
+import logger from './config/logger.js';
 import cors from 'cors';
 
 const app = express();
@@ -20,8 +20,10 @@ app.use(express.urlencoded({extended:true}));
 app.use(current);
 //Routers
 app.use('/api/user', userRouter);
-app.use('/api/business', businessRouter);
 app.use('/api/order', orderRouter);
 
 //Iniciar el servidor
-app.listen(config.PORT, ()=> console.log(`Listening on PORT: ${config.PORT}`))
+app.listen(config.PORT, ()=> {
+  console.log(`Listening on PORT: ${config.PORT}`);
+  logger.info(`Server listening on port ${config.PORT}`);
+})
