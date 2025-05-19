@@ -3,29 +3,26 @@ import { getOrders, getOrderById, createOrder, resolveOrder, purchaseCart } from
 import { authorize } from '../middleware/authorization.middleware.js';
 import logger from '../config/logger.js';
 
+// Router initialization
 const router = Router();
 
-router.get('/', (req, res, next) => {
-  logger.info('GET /api/order');
+// Middleware global de logging
+router.use((req, res, next) => {
+  logger.info(`${req.method} ${req.originalUrl}`);
   next();
-}, getOrders);
-router.get('/:oid', (req, res, next) => {
-  logger.info(`GET /api/order/${req.params.oid}`);
-  next();
-}, getOrderById);
+});
 
-router.post('/', authorize('user'),(req, res, next) => {
-  logger.info('POST /api/order');
-  next();
-}, createOrder);
-router.put('/:oid', (req, res, next) => {
-  logger.info(`PUT /api/order/${req.params.oid}`);
-  next();
-}, resolveOrder);
+// Rutas para obtener órdenes
+router.get('/', getOrders);
+router.get('/:oid', getOrderById);
 
-router.post('/:cid/purchase', (req, res, next) => {
-  logger.info(`POST /api/order/${req.params.cid}/purchase`);
-  next();
-}, purchaseCart);
+// Ruta para crear una orden (solo usuarios autorizados)
+router.post('/', authorize('user'), createOrder);
+
+// Ruta para resolver una orden (por ejemplo, completarla o cancelarla)
+router.put('/:oid', resolveOrder);
+
+// Ruta para comprar un carrito de compras
+router.post('/:cid/purchase', purchaseCart);
 
 export default router;

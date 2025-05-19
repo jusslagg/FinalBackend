@@ -1,8 +1,5 @@
-import dotenv from 'dotenv';
+import config from './serve/src/config/config.js';
 
-dotenv.config();
-
-export default {
-    PORT: process.env.PORT || 8080,
-    URL_MONGO: process.env.URL_MONGO || 'mongodb://localhost:27017/CoderHouse-2'
-}
+app.listen(config.PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${config.PORT}`);
+});
