@@ -1,5 +1,8 @@
-import config from './serve/src/config/config.js';
+import dotenv from 'dotenv';
 
-app.listen(config.PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${config.PORT}`);
-});
+dotenv.config();
+
+export default {
+    PORT: process.env.PORT || 8080,
+    URL_MONGO: process.env.URL_MONGO || 'mongodb://localhost:27017/videojuegos'
+}

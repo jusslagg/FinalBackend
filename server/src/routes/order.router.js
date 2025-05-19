@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getOrders, getOrderById, createOrder, resolveOrder, purchaseCart } from '../controller/order.controller.js';
+import { getOrders, getOrderById, resolveOrder, purchaseCart } from '../controller/order.controller.js';
 import { authorize } from '../middleware/authorization.middleware.js';
 import logger from '../config/logger.js';
 
@@ -15,9 +15,6 @@ router.use((req, res, next) => {
 // Rutas para obtener órdenes
 router.get('/', getOrders);
 router.get('/:oid', getOrderById);
-
-// Ruta para crear una orden (solo usuarios autorizados)
-router.post('/', authorize('user'), createOrder);
 
 // Ruta para resolver una orden (por ejemplo, completarla o cancelarla)
 router.put('/:oid', resolveOrder);
