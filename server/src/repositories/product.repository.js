@@ -6,72 +6,32 @@ export default class ProductRepository {
         this.dao = new ProductDao();
     }
 
-    // Obtener todos los productos
     getProduct = async () => {
-        try {
-            const products = await this.dao.getProduct();
-            return products;
-        } catch (error) {
-            console.log("Error al obtener productos:", error);
-            return null;
-        }
-    };
+        let result = await this.dao.getProduct();
+        return result;
+    }
 
-    // Obtener un producto por ID
     getProductById = async (id) => {
-        try {
-            const product = await this.dao.getProductById(id);
-            if (!product) {
-                console.log("Producto no encontrado.");
-                return null;
-            }
-            return new ProductDTO(product);
-        } catch (error) {
-            console.log("Error al obtener el producto por ID:", error);
-            return null;
-        }
-    };
+        let result = await this.dao.getProductById(id);
+        return result;
+    }
 
-    // Crear un producto
+
     createProduct = async (product) => {
-        try {
-            const productToInsert = new ProductDTO(product);
-            const createdProduct = await this.dao.createProduct(productToInsert);
-            return new ProductDTO(createdProduct);
-        } catch (error) {
-            console.log("Error al crear producto:", error);
-            return null;
-        }
-    };
+        let productToInsert = new ProductDTO(product);
+        let result = await this.dao.createProduct(productToInsert);
+        return result;
+    }
 
-    // Actualizar un producto
-    updateProduct = async (id, product) => {
-        try {
-            const productToUpdate = new ProductDTO(product);
-            const updatedProduct = await this.dao.updateProduct(id, productToUpdate);
-            if (!updatedProduct) {
-                console.log("Producto no encontrado para actualizar.");
-                return null;
-            }
-            return new ProductDTO(updatedProduct);
-        } catch (error) {
-            console.log("Error al actualizar el producto:", error);
-            return null;
-        }
-    };
 
-    // Eliminar un producto
+    updateProduct = async (id,product) => {
+        let productToUpdate = new ProductDTO(product);
+        let result = await this.dao.updateProduct(id, productToUpdate);
+        return result;
+    }
+
     deleteProduct = async (id) => {
-        try {
-            const deletedProduct = await this.dao.deleteProduct(id);
-            if (!deletedProduct) {
-                console.log("Producto no encontrado para eliminar.");
-                return null;
-            }
-            return deletedProduct;
-        } catch (error) {
-            console.log("Error al eliminar el producto:", error);
-            return null;
-        }
-    };
+        let result = await this.dao.deleteProduct(id);
+        return result;
+    }
 }

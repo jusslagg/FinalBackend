@@ -1,98 +1,89 @@
 import cartModel from "../dao/models/cart.model.js";
 import ProductModel from "./models/product.model.js";
 
-export default class Cart {
 
-    getCartById = async (id) => {
-        try {
-            const cart = await cartModel.findById(id).populate("products.product");
-            if (!cart) {
-                console.warn(`🛒 Carrito con ID ${id} no encontrado`);
-                return null;
-            }
-            return cart;
-        } catch (error) {
-            console.error("❌ Error en getCartById:", error.message);
-            return null;
+
+export default class Cart{
+
+    getCartById=async (id) =>{
+        try{
+            return await cartModel.findById(id).populate("products.product")
         }
-    };
+        catch(error){
+            console.log(error);
+            return null
+        }
+    }
 
-    createCart = async () => {
+    createCart=async (cart) =>{
         try {
-            const newCart = await cartModel.create({ products: [] });
+            let newCart = await cartModel.create({ products: [] });
             return newCart;
         } catch (error) {
-            console.error("❌ Error en createCart:", error.message);
-            return null;
+            console.log(error);
+            return null
         }
-    };
+    }
 
-    deleteCart = async (id) => {
+    deleteCart=async (id) =>{
         try {
-            const result = await cartModel.deleteOne({ _id: id });
-            if (result.deletedCount === 0) {
-                console.warn(`🛒 No se encontró carrito para eliminar con ID: ${id}`);
-                return null;
-            }
-            return result;
+            let cartDeleted = await cartModel.deleteOne({_id: id});
+            return cartDeleted
         } catch (error) {
-            console.error("❌ Error en deleteCart:", error.message);
-            return null;
+            console.log(error);
+            return null
         }
-    };
+    }  
 
-    addProductToCart = async (cartId, productId, quantity = 1) => {
-        try {
+        addProductToCart = async (cartId, productId, quantity = 1) => {
+            try {
             const product = await ProductModel.findById(productId);
             if (!product) {
-                console.warn(`📦 Producto no encontrado con ID: ${productId}`);
-                return null;
+                throw new Error("Product not found");
             }
-
+        
             if (product.stock < quantity || product.stock === 0) {
-                console.warn(`⚠️ Stock insuficiente para el producto: ${product.nombre}`);
-                return null;
+                throw new Error("Not enough stock");
             }
-
+        
             const cart = await cartModel.findById(cartId);
             if (!cart) {
-                console.warn(`🛒 Carrito no encontrado con ID: ${cartId}`);
                 return null;
             }
-
-            if (!cart.products) cart.products = [];
-
-            const index = cart.products.findIndex(p => p.product.toString() === productId);
-            if (index !== -1) {
-                cart.products[index].quantity += quantity;
+        
+            if (!cart.products) {
+                cart.products = [];
+            }
+        
+            const productIndex = cart.products.findIndex(
+                (p) => p.product.toString() === productId
+            );
+        
+            if (productIndex !== -1) {
+                cart.products[productIndex].quantity += quantity;
             } else {
                 cart.products.push({ product: productId, quantity });
             }
-
+        
             const updatedCart = await cart.save();
             return updatedCart;
-        } catch (error) {
-            console.error("❌ Error en addProductToCart:", error.message);
+            } catch (error) {
+            console.log("❌ Error al agregar producto al carrito:", error.message);
             return null;
-        }
-    };
+            }
+        };
 
-    deleteProductFromCart = async (cartId, productId) => {
+    deleteProductFromCart=async (cartId,productId) =>{
         try {
-            const result = await cartModel.updateOne(
+            const cartUpdated = await cartModel.updateOne(
                 { _id: cartId },
                 { $pull: { products: { product: productId } } }
-            );
-
-            if (result.modifiedCount === 0) {
-                console.warn(`⚠️ No se encontró el producto ${productId} en el carrito ${cartId}`);
-                return null;
-            }
-
-            return result;
+            );         
+            return cartUpdated
         } catch (error) {
-            console.error("❌ Error en deleteProductFromCart:", error.message);
-            return null;
+            console.log(error);
+            return null
         }
-    };
+    }
+
 }
