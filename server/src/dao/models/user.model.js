@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 const collection = "user";
 
 const userSchema = new mongoose.Schema ({
-    name : String,
-    email : String,
-    role: String,
-    orders: [
-        {
+    first_name : { type: String, required: true },
+    last_name : { type: String, required: true },
+    email : { type: String, required: true, unique: true },
+    password : { type: String, required: true },
+    role: { type: String, default: 'user' },
+    orders: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'order'
         }
