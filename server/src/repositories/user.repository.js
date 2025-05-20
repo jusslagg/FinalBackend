@@ -1,69 +1,35 @@
-import { UserRequestDTO, UserResponseDTO } from "../dao/dto/user.dto.js";
+import UserDTO from "../dao/dto/user.dto.js";
 import UserDao from "../dao/user.dao.js";
 
 export default class UserRepository {
-
     constructor() {
         this.dao = new UserDao();
     }
 
-    // Obtener todos los usuarios
-    getUsers = async () => {
-        try {
-            let result = await this.dao.getUsers();
-            return result;
-        } catch (error) {
-            console.error(`Error fetching users: ${error.message}`);
-            throw new Error('Error fetching users');
-        }
+    getUser = async () => {
+        let result = await this.dao.getUser();
+        return result;
     }
 
-    // Obtener un usuario por su ID
     getUserById = async (id) => {
-        try {
-            let result = await this.dao.getUserById(id);
-            if (!result) {
-                throw new Error('User not found');
-            }
-            return new UserResponseDTO(result);
-        } catch (error) {
-            console.error(`Error fetching user by ID: ${error.message}`);
-            throw new Error(`Error fetching user by ID: ${error.message}`);
-        }
+        let result = await this.dao.getUserById(id);
+        return result;
     }
 
-    // Guardar un nuevo usuario
     saveUser = async (user) => {
-        try {
-            let userToInsert = new UserRequestDTO(user);
-            let result = await this.dao.saveUser(userToInsert);
-            return result;
-        } catch (error) {
-            console.error(`Error saving user: ${error.message}`);
-            throw new Error('Error saving user');
-        }
+        let userToInsert = new UserDTO(user);
+        let result = await this.dao.saveUser(userToInsert);
+        return result;
     }
 
-    // Actualizar un usuario existente
-    updateUser = async (id, user) => {
-        try {
-            let userToUpdate = new UserRequestDTO(user);
-            let result = await this.dao.updateUser(id, userToUpdate);
-            return result;
-        } catch (error) {
-            console.error(`Error updating user: ${error.message}`);
-            throw new Error('Error updating user');
-        }
+    updateUser = async (id,user) => {
+        let userToUpdate = new UserDTO(user);
+        let result = await this.dao.updateUser(id ,userToUpdate);
+        return result;
     }
 
-    // Eliminar un usuario
     deleteUser = async (id) => {
-        try {
-            let result = await this.dao.deleteUser(id);
-            return result;
-        } catch (error) {
-            console.error(`Error deleting user: ${error.message}`);
-            throw new Error('Error deleting user');
-        }
+        let result = await this.dao.deleteUser(id);
+        return result;
     }
 }
