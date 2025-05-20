@@ -19,7 +19,14 @@ export default class Order {
     // Obtener una orden por ID
     getOrderById = async (id) => {
         try {
-            let order = await orderModel.findOne({ _id: id });
+            let orderId;
+            try {
+                orderId = new mongoose.Types.ObjectId(id);
+            } catch (error) {
+                logger.error(`Invalid order ID ${id}: ${error.message}`);
+                return null;
+            }
+            let order = await orderModel.findOne({ _id: orderId });
             if (order) {
                 return new OrderDTO(order); // Devolvemos el DTO
             }
