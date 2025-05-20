@@ -1,22 +1,47 @@
 import OrderRepository from '../repositories/order.repository.js';
 import UserRepository from '../repositories/user.repository.js';
 import TicketRepository from '../repositories/ticket.repository.js';
+// import CartService from '../cart.service.js';
 import { generateUniqueCode } from '../utils.js';
 import logger from '../config/logger.js';
-import OrderDTO from '../dao/dto/order.dto.js'; // Importamos el DTO
+import OrderDTO from '../dao/dto/order.dto.js';
+// import productService from '../product.service.js';
 
 const orderService = new OrderRepository();
 const userService = new UserRepository();
 const ticketService = new TicketRepository();
+// const cartService = new CartService();
 
-// Obtener todas las órdenes
+// ✅ Crear una nueva orden
+export const createOrder = async (req, res) => {
+  try {
+    const { user, items } = req.body;
+
+    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    const newOrder = {
+      user,
+      items,
+      totalPrice,
+      status: "pending"
+    };
+
+    const result = await orderService.createOrder(newOrder);
+    const transformed = new OrderDTO(result);
+
+    res.status(201).send({ status: "success", result: transformed });
+    logger.info('Order created successfully');
+  } catch (error) {
+    logger.error(`Error creating order: ${error.message}`);
+    res.status(500).send({ status: "error", message: "Error creating order" });
+  }
+};
+
+// ✅ Obtener todas las órdenes
 export const getOrders = async (req, res) => {
   try {
     const result = await orderService.getOrders();
-    
-    // Usamos el DTO para transformar las órdenes antes de enviarlas
     const transformedOrders = result.map(order => new OrderDTO(order));
-
     res.send({ status: "success", result: transformedOrders });
     logger.info('Get orders');
   } catch (error) {
@@ -25,7 +50,7 @@ export const getOrders = async (req, res) => {
   }
 };
 
-// Obtener una orden por su ID
+// ✅ Obtener una orden por su ID
 export const getOrderById = async (req, res) => {
   try {
     const { oid } = req.params;
@@ -36,7 +61,6 @@ export const getOrderById = async (req, res) => {
       return res.status(404).send({ status: "error", message: "Order not found" });
     }
 
-    // Usamos el DTO para transformar la orden
     const result = new OrderDTO(order);
     res.send({ status: "success", result });
     logger.info(`Get order by id: ${oid}`);
@@ -46,7 +70,7 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-// Resolver una orden (completar o cancelar)
+// ✅ Actualizar estado de la orden
 export const resolveOrder = async (req, res) => {
   try {
     const resolve = req.query.resolve;
@@ -57,12 +81,10 @@ export const resolveOrder = async (req, res) => {
       return res.status(404).send({ status: "error", message: "Order not found" });
     }
 
-    // Actualizamos el estado de la orden
     order.status = resolve;
     const result = await orderService.resolveOrder(order._id, order);
-
-    // Usamos el DTO para transformar la respuesta
     const transformedResult = new OrderDTO(result);
+
     res.send({ status: "success", result: transformedResult });
     logger.info(`Order resolved: ${req.params.oid} - Status: ${resolve}`);
   } catch (error) {
@@ -71,66 +93,84 @@ export const resolveOrder = async (req, res) => {
   }
 };
 
-// Procesar la compra de un carrito
-export const purchaseCart = async (req, res) => {
+// ✅ Eliminar una orden
+export const deleteOrder = async (req, res) => {
   try {
-    const { cid } = req.params;
-    const cart = await orderService.getOrderById(cid);
+    const { oid } = req.params;
+    const result = await orderService.deleteOrder(oid);
 
-    if (!cart) {
-      logger.warn(`Cart not found: ${cid}`);
-      return res.status(404).send({ status: "error", message: "Cart not found" });
+    if (!result) {
+      logger.warn(`Order not found: ${oid}`);
+      return res.status(404).send({ status: "error", message: "Order not found" });
     }
 
-    let processedItems = [];
-    let remainingItems = [];
-    let amount = 0;
-
-    // Simulamos validación de stock
-    for (const item of cart.items) {
-      const hasStock = true; // TODO: Implementar validación de stock real
-
-      if (hasStock) {
-        processedItems.push(item);
-        amount += item.price || 0;
-      } else {
-        remainingItems.push(item);
-      }
-    }
-
-    if (processedItems.length === 0) {
-      return res.status(400).send({ status: "error", message: "No items could be processed due to insufficient stock" });
-    }
-
-    // Crear ticket de compra
-    const ticketData = {
-      code: generateUniqueCode(),
-      amount,
-      purchaser: req.user?.email || "anonymous"
-    };
-
-    const ticket = await ticketService.createTicket(ticketData);
-
-    // Actualizar el carrito con los elementos restantes
-    cart.items = remainingItems;
-    cart.totalPrice = remainingItems.reduce((sum, item) => sum + (item.price || 0), 0);
-    await orderService.resolveOrder(cid, cart);
-
-    // Usamos el DTO para transformar la respuesta del carrito
-    const transformedCart = new OrderDTO(cart);
-
-    res.send({
-      status: "success",
-      message: "Purchase completed",
-      ticket,
-      processedItems,
-      remainingItems,
-      cart: transformedCart // Devolvemos el carrito transformado
-    });
-
-    logger.info(`Purchase completed for cart: ${cid}`);
+    res.send({ status: "success", message: "Order deleted" });
+    logger.info(`Order deleted: ${oid}`);
   } catch (error) {
-    logger.error(`Error purchasing cart: ${error.message}`);
-    res.status(500).send({ status: "error", message: "Error purchasing cart" });
+    logger.error(`Error deleting order: ${error.message}`);
+    res.status(500).send({ status: "error", message: "Error deleting order" });
   }
 };
+
+// // ✅ Procesar compra de carrito
+// export const purchaseCart = async (req, res) => {
+//   try {
+//     const { cid } = req.params;
+//     // const cart = await cartService.getCartById(cid);
+
+//     // if (!cart) {
+//     //   logger.warn(`Cart not found: ${cid}`);
+//     //   return res.status(404).send({ status: "error", message: "Cart not found" });
+//     // }
+
+//     // let processedItems = [];
+//     // let remainingItems = [];
+//     // let amount = 0;
+
+//     // for (const item of cart.items) {
+//     //   // const product = await productService.getProductById(item.product);
+//     //   // const hasStock = product && product.stock >= item.quantity;
+
+//     //   // if (hasStock) {
+//     //   //   processedItems.push(item);
+//     //   //   amount += item.price || 0;
+//     //   //   product.stock -= item.quantity;
+//     //   //   await productService.updateProduct(item.product, { stock: product.stock });
+//     //   // } else {
+//     //   //   remainingItems.push(item);
+//     //   // }
+//     // }
+
+//     // if (processedItems.length === 0) {
+//     //   return res.status(400).send({ status: "error", message: "No items could be processed due to insufficient stock" });
+//     // }
+
+//     // const ticketData = {
+//     //   code: generateUniqueCode(),
+//     //   amount,
+//     //   purchaser: req.user?.email || "anonymous"
+//     // };
+
+//     // const ticket = await ticketService.createTicket(ticketData);
+
+//     // cart.items = remainingItems;
+//     // cart.totalPrice = remainingItems.reduce((sum, item) => sum + (item.price || 0), 0);
+//     // await cartService.updateCart(cid, cart);
+
+//     // const transformedCart = new OrderDTO(cart);
+
+//     // res.send({
+//     //   status: "success",
+//     //   message: "Purchase completed",
+//     //   ticket,
+//     //   processedItems,
+//     //   remainingItems,
+//     //   cart: transformedCart
+//     // });
+
+//     // logger.info(`Purchase completed for cart: ${cid}`);
+//   } catch (error) {
+//     logger.error(`Error purchasing cart: ${error.message}`);
+//     res.status(500).send({ status: "error", message: "Error purchasing cart" });
+//   }
+// };

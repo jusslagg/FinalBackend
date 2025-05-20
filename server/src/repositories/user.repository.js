@@ -35,7 +35,6 @@ export default class UserRepository {
     // Guardar un nuevo usuario
     saveUser = async (user) => {
         try {
-            // Aquí usamos UserRequestDTO, ya que es la que contiene los campos necesarios para crear un usuario
             let userToInsert = new UserRequestDTO(user);
             let result = await this.dao.saveUser(userToInsert);
             return result;
@@ -48,12 +47,23 @@ export default class UserRepository {
     // Actualizar un usuario existente
     updateUser = async (id, user) => {
         try {
-            let userToUpdate = new UserRequestDTO(user); // Utilizamos UserRequestDTO también para la actualización
+            let userToUpdate = new UserRequestDTO(user);
             let result = await this.dao.updateUser(id, userToUpdate);
             return result;
         } catch (error) {
             console.error(`Error updating user: ${error.message}`);
             throw new Error('Error updating user');
+        }
+    }
+
+    // Eliminar un usuario
+    deleteUser = async (id) => {
+        try {
+            let result = await this.dao.deleteUser(id);
+            return result;
+        } catch (error) {
+            console.error(`Error deleting user: ${error.message}`);
+            throw new Error('Error deleting user');
         }
     }
 }
