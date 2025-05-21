@@ -1,9 +1,11 @@
+// DTO para la orden
 export default class OrderDTO{
     constructor(order){
-        this.id = order._id;
-            this.user = order.user;
-            this.cart = order.cart;
-            this.total = order.total;
-            this.createdAt = order.createdAt;
+        // Mapea los datos de la orden al DTO
+        this.id = order._id; // ID de la orden
+            this.user = order.user; // Usuario que realizó la orden
+            this.cart = order.cart; // Carrito asociado a la orden
+            this.total = order.total; // Total de la orden
+            this.createdAt = order.createdAt; // Fecha de creación de la orden
     }
 }
