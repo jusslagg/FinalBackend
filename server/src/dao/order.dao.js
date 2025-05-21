@@ -2,25 +2,23 @@ import orderModel from '../dao/models/order.model.js';
 
 export default class Order{
 
-    // Crea una orden
     createOrder = async (order) => {
         try {
-            let createdOrder = await orderModel.create(order); // Crea la orden en la base de datos
-            return createdOrder // Retorna la orden creada
+            let createdOrder = await orderModel.create(order);
+            return createdOrder
 
         } catch (error) {
-            console.log(error); // Imprime el error en la consola
-            return null // Retorna null si hay un error
+            console.log(error);
+            throw error;
         }
     }
 
-    // Obtiene todas las ordenes
-    getOrders  =async () => {
+    getOrderById  =async (id) => {
         try {
-            return await orderModel.find().populate("user").populate("cart"); // Busca todas las ordenes y popula los campos de usuario y carrito
+            return await orderModel.findById(id).populate("user").populate("cart");
         } catch (error) {
-            console.log(error); // Imprime el error en la consola
-            return null // Retorna null si hay un error
+            console.log(error);
+            throw error;
         }
     }
 }

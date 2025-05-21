@@ -4,47 +4,52 @@ import productModel from "../dao/models/product.model.js";
 
 const orderService = new orderRepository();
 
-// Controlador para crear una orden
 export const createOrder = async (req, res) => {
-    const {userId, cartId} = req.body; // Extrae el userId y cartId del cuerpo de la solicitud
+    const {userId, cartId} = req.body;
 
     try {
-        let total = 0; // Inicializa el total
-        const cart = await cartModel.findById(cartId).populate("products.product"); // Busca el carrito por su ID y popula los productos
-        if(!cart) { // Si no se encuentra el carrito
+        let total = 0;
+        const cart = await cartModel.findById(cartId).populate("products.product");
+        if(!cart) {
             console.log("Carrito no encontrado");
-            return res.status(404).send({status: "error", error: "Carrito no encontrado"}); // Retorna un error 404
+            return res.status(404).send({status: "error", error: "Carrito no encontrado"});
         }
 
-        console.log("Productos en el carrito:", cart.products); // Imprime los productos en el carrito
+        console.log("Productos en el carrito:", cart.products);
         
 
-        for (const item of cart.products) { // Itera sobre los productos en el carrito
-            if (!item.product) continue; // Si no hay producto, continua
+        for (const item of cart.products) {
+            if (!item.product) continue;
         
-            if (item.product.stock < item.quantity) { // Si no hay suficiente stock
-            return res.status(400).send({ error: `Sin stock para ${item.product.nombre}` }); // Retorna un error 400
+            if (item.product.stock < item.quantity) {
+            return res.status(400).send({ error: `Sin stock para ${item.product.nombre}` });
             }
         
-            item.product.stock -= item.quantity; // Reduce el stock del producto
-            await item.product.save(); // Guarda el producto
+            item.product.stock -= item.quantity;
+            await item.product.save();
         
-            total += item.product.precio * item.quantity; // Calcula el total
+            total += item.product.precio * item.quantity;
         }
 
-        const order = await orderService.createOrder(userId, cartId, total); // Crea la orden
-        console.log("Pedido creado con éxito:", order); // Imprime la orden creada
-        res.send({status: "success", message: "Pedido creado con éxito"}); // Retorna un mensaje de éxito
+        const order = await orderService.createOrder(userId, cartId, total);
+        console.log("Pedido creado con éxito:", order);
+        res.send({status: "success", message: "Pedido creado con éxito"});
         
     } catch (error) {
-        res.status(500).send({status: "error", error: error.message}); // Retorna un error 500
+        res.status(500).send({status: "error", error: error.message});
     }
 }
 
-// Controlador para obtener las ordenes - Solo ADMIN
-export const getOrders = async (req, res) => {
-    const result = await orderService.getOrders(); // Llama al servicio para obtener las ordenes
-    res.send({ status: "success", result }); // Retorna las ordenes
-};
+export const getOrderById = async (req, res) => {
+    const {oid} = req.params;
+    try {
+        const result = await orderService.getOrderById(oid);
+        if (!result) {
+            return res.status(404).send({ status: "error", error: "Pedido no encontrado" });
+        }
+        res.send({ status: "success", result });
+    } catch (error) {
+        res.status(500).send({ status: "error", error: error.message });
+    }
 
-getOrders.allowedRoles = ["ADMIN"];
+};

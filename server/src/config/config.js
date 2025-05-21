@@ -1,8 +1,9 @@
-import dotenv from 'dotenv'; // Importa la librería dotenv
+import dotenv from 'dotenv';
 
-dotenv.config(); // Carga las variables de entorno del archivo .env
+dotenv.config();
 
 export default {
-    PORT: process.env.PORT || 8081, // Puerto de la aplicación, si no existe la variable de entorno, usa el puerto 8081
-    URL_MONGO: process.env.MONGO_URL || 'mongodb+srv://admin:admin@cluster0.su6usvk.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0' // URL de la base de datos MongoDB, si no existe la variable de entorno, usa la URL por defecto
+    PORT: process.env.PORT || 8081,
+    MONGO_URL: process.env.MONGO_URL,
+    secret_JWT: process.env.JWT_PRIVATE_KEY
 }

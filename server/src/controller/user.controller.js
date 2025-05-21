@@ -1,43 +1,79 @@
 import UserRepository from "../repositories/user.repository.js";
 
-const userService = new UserRepository(); // Crea una instancia del repositorio de usuarios
+const userService = new UserRepository();
 
-// Obtiene un usuario por ID - Solo ADMIN
 export const getUserById = async (req, res) => {
-    const {uid} = req.params; // Extrae el ID del usuario de los parámetros de la solicitud
-    let result = await userService.getUserById(uid); // Llama al servicio para obtener el usuario
-    res.send({status: "success", result}); // Envía la respuesta con el usuario
+    const {uid} = req.params;
+    try{
+        let result = await userService.getUserById(uid);
+
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Usuario no encontrado" });
+        }
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
+    }
+
 }
 
-// Obtiene todos los usuarios
 export const getUsers = async (req, res) => {
-    let result = await userService.getUser(); // Llama al servicio para obtener los usuarios
-    res.send({status: "success", result}); // Envía la respuesta con los usuarios
+    try {
+    let result = await userService.getUser();
+
+    if (!result) {
+        return res.status(404).send({ status: "error", message: "Usuarios no encontrados" });
+    }
+
+    res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
+    }
 }
 
-// Guarda un nuevo usuario - Solo ADMIN
 export const saveUser = async (req, res) => {
-    const user = req.body; // Extrae el usuario del cuerpo de la solicitud
-    let result = await userService.saveUser(user); // Llama al servicio para guardar el usuario
-    res.send({status: "success", result}); // Envía la respuesta con el usuario guardado
+    const user = req.body;
+    try{
+        let result = await userService.saveUser(user);
+
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Error al crear usuario" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });    }
 }
 
-// Actualiza un usuario - Solo ADMIN
 export const updateUser = async (req, res) => {
-    const {uid} = req.params; // Extrae el ID del usuario de los parámetros de la solicitud
-    const user = req.body; // Extrae el usuario del cuerpo de la solicitud
-    let result = await userService.updateUser(uid,user); // Llama al servicio para actualizar el usuario
-    res.send({status: "success", result}); // Envía la respuesta con el usuario actualizado
+    const {uid} = req.params;
+    const user = req.body;
+    try {
+        let result = await userService.updateUser(uid,user);
+
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Error al actualizar usuario" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });    }
+
 }
 
-// Elimina un usuario - Solo ADMIN
 export const deleteUser = async (req, res) => {
-    const {uid} = req.params; // Extrae el ID del usuario de los parámetros de la solicitud
-    let result = await userService.deleteUser(uid); // Llama al servicio para eliminar el usuario
-    res.send({status: "success", result}); // Envía la respuesta con el resultado de la eliminación
-}
+    const {uid} = req.params;
+    try{
+        let result = await userService.deleteUser(uid);
 
-deleteUser.allowedRoles = ["ADMIN"];
-getUserById.allowedRoles = ["ADMIN"];
-saveUser.allowedRoles = ["ADMIN"];
-updateUser.allowedRoles = ["ADMIN"];
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Error al eliminar usuario" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
+    }
+    
+}

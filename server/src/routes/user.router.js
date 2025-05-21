@@ -1,27 +1,29 @@
-import {Router} from 'express'; // Importa el Router de Express
-import {getUsers, getUserById, saveUser, updateUser, deleteUser} from '../controller/user.controller.js'; // Importa las funciones del controlador de usuarios
-import { authorize } from '../middleware/authorization.middleware.js';
 
-const router = Router(); // Crea una instancia del Router de Express
-
-// Ruta para obtener todos los usuarios - Solo ADMIN
-router.get('/', authorize(["ADMIN"]), getUsers);
+import {getUsers, getUserById, saveUser, updateUser, deleteUser} from '../controller/user.controller.js';
+import Router from './js/router.js';
 
 
-// Ruta para obtener un usuario por ID - ADMIN or Self
-router.get('/:uid', authorize(["ADMIN", "USER"]), getUserById);
 
+export default class userRouter extends Router {
 
-// Ruta para crear un nuevo usuario - Solo ADMIN
-router.post('/', authorize(["ADMIN"]), saveUser);
+    init() {
 
+    //obtener ususarios
+    this.get('/',["PUBLIC"],  getUsers);
 
-// Ruta para actualizar un usuario - Solo ADMIN
-router.put('/:uid', authorize(["ADMIN", "USER"]), updateUser);
+    //obtener un usuario
+    this.get('/:uid',["PUBLIC"], getUserById);
 
+    //crear un usuario
+    this.post('/',["PUBLIC"], saveUser);
 
-// Ruta para eliminar un usuario - Solo ADMIN
-router.delete('/:uid', authorize(["ADMIN"]), deleteUser);
+    //actualizar un usuario
+    this.put('/:uid',["PUBLIC"], updateUser);
 
-export default router; // Exporta el router
+    //borrar un usuario
+    this.delete('/:uid',["ADMIN"], deleteUser); 
+    }
+
+}
+
 

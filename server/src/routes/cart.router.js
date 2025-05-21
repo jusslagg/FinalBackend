@@ -1,22 +1,19 @@
-import {Router} from 'express';
-import {getCartById, createCart, deleteCart, addProductToCart, deleteProductFromCart} from '../controller/cart.controller.js'; // Importa las funciones del controlador de carritos
-import { authorize } from '../middleware/authorization.middleware.js';
+import Router from './js/router.js';
+import {getCartById, createCart, deleteCart, addProductToCart, deleteProductFromCart} from '../controller/cart.controller.js';
 
-const router = Router(); // Crea una instancia del Router de Express
 
-// Ruta para obtener un carrito por ID
-router.get('/:cid', getCartById);
+export default class cartRouter extends Router {
+    init(){
 
-// Ruta para crear un nuevo carrito
-router.post('/', createCart);
+        this.get('/:cid',["PUBLIC"], getCartById);
 
-// Ruta para eliminar un carrito - Solo ADMIN
-router.delete('/:cid', authorize(["ADMIN"]), deleteCart);
+        this.post('/',["ADMIN"], createCart);
+        
+        this.delete('/:cid',["PUBLIC"], deleteCart);
+        
+        this.post('/:cid/product/:pid',["PUBLIC"], addProductToCart);
+        
+        this.delete('/:cid/product/:pid',["PUBLIC"], deleteProductFromCart);
 
-// Ruta para agregar un producto al carrito - USER and ADMIN
-router.post('/:cid/product/:pid', authorize(["USER", "ADMIN"]), addProductToCart); // Solo usuarios y administradores pueden agregar productos al carrito
-
-// Ruta para eliminar un producto del carrito
-router.delete('/:cid/product/:pid', deleteProductFromCart); // Cualquiera puede eliminar productos del carrito
-
-export default router;
+    }   
+}

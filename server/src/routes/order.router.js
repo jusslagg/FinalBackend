@@ -1,15 +1,19 @@
-import {Router} from 'express'; // Importa el Router de Express
-import {getOrders, createOrder} from '../controller/order.controller.js'; // Importa las funciones del controlador de ordenes
-import { authorize } from '../middleware/authorization.middleware.js';
+import Router from './js/router.js';
+import {getOrderById, createOrder} from '../controller/order.controller.js';
 
-const router = Router(); // Crea una instancia del Router de Express
+export default class orderRouter extends Router {
+    init(){
 
-// Ruta para obtener todas las ordenes - Solo ADMIN
-router.get('/', authorize(["ADMIN"]), getOrders);
-
-
-// Ruta para crear una orden
-router.post('/', createOrder);
+        //obtener ordenes
+        this.get('/:oid',["ADMIN"], getOrderById);
 
 
-export default router; // Exporta el router
+        //crear orden
+        this.post('/',["ADMIN"], createOrder);
+
+    }   
+}
+
+
+
+

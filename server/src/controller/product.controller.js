@@ -4,49 +4,88 @@ import ProductRepository from "../repositories/product.repository.js";
 const productService = new ProductRepository();
 
 
-// Obtiene un producto por ID
 export const getProductById =  async(req, res) => {
-    const {pid} = req.params; // Extrae el ID del producto de los parámetros de la solicitud
-    let result =  await productService.getProductById(pid); // Llama al servicio para obtener el producto
-    res.send({status: "success", result}); // Envía la respuesta con el producto
+    const {pid} = req.params;
+    try{
+        let result =  await productService.getProductById(pid);
+
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Producto no encontrado" });
+        }
+        res.send({status: "success", result});
+    } catch (error) {
+        console.error("Error al obtener producto por ID:", error);
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
+    }
+
 }
 
-// Obtiene todos los productos
 export const getProduct = async(req, res) => {
-    let result = await productService.getProduct(); // Llama al servicio para obtener los productos
-    res.send({status: "success", result}); // Envía la respuesta con los productos
+    try{
+        let result = await productService.getProduct();
+
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Productos no encontrados" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
+    }
 }
 
-// Crea un nuevo producto
 export const createProduct = async(req, res) => {
-    const product = req.body; // Extrae el producto del cuerpo de la solicitud
+    const product = req.body;
+    try {
+        if (product.stock < 0) {
+            return res.status(400).send({ error: "El stock no puede ser negativo" });
+        }
+        
+        let result = await productService.createProduct(product);
 
-    if (product.stock < 0) { // Si el stock es negativo
-        return res.status(400).send({ error: "El stock no puede ser negativo" }); // Envía un error
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Error al crear producto" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
     }
-    
-    let result = await productService.createProduct(product); // Llama al servicio para crear el producto
-    res.send({status: "success", result}); // Envía la respuesta con el producto creado
 }
 
-// Actualiza un producto
 export const updateProduct = async(req, res) => {
-    const {pid} = req.params; // Extrae el ID del producto de los parámetros de la solicitud
-    const product = req.body; // Extrae el producto del cuerpo de la solicitud
+    const {pid} = req.params;
+    const product = req.body;
+    try {
+        if (product.stock < 0) {
+            return res.status(400).send({ error: "El stock no puede ser negativo" });
+        }
+    
+        let result = await productService.updateProduct(pid, product);
 
-    if (product.stock < 0) { // Si el stock es negativo
-        return res.status(400).send({ error: "El stock no puede ser negativo" }); // Envía un error
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Error al actualizar producto" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
     }
 
-    let result = await productService.updateProduct(pid, product); // Llama al servicio para actualizar el producto
-    res.send({status: "success", result}); // Envía la respuesta con el producto actualizado
 }
 
-// Elimina un producto
 export const deleteProduct = async(req, res) => {
-    const {pid} = req.params; // Extrae el ID del producto de los parámetros de la solicitud
-    let result = await productService.deleteProduct(pid); // Llama al servicio para eliminar el producto
-    res.send({status: "success", result}); // Envía la respuesta con el resultado de la eliminación
-}
+    const {pid} = req.params;
+    try{
+        let result = await productService.deleteProduct(pid);
 
-deleteProduct.allowedRoles = ["ADMIN"];
+        if (!result) {
+            return res.status(404).send({ status: "error", message: "Error al eliminar producto" });
+        }
+
+        res.send({status: "success", result});
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Error interno del servidor" });
+    }
+
+}

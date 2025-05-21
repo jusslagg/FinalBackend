@@ -1,43 +1,37 @@
-import ProductDTO from "../dao/dto/product.dto.js"; // Importa el DTO de productos
-import ProductDao from "../dao/product.dao.js"; // Importa el DAO de productos
+import ProductDTO from "../dao/dto/product.dto.js";
+import ProductDao from "../dao/product.dao.js";
 
-// Clase para el repositorio de productos
 export default class ProductRepository {
     constructor() {
-        this.dao = new ProductDao(); // Crea una instancia del DAO de productos
+        this.dao = new ProductDao();
     }
 
-    // Obtiene todos los productos
     getProduct = async () => {
-        let result = await this.dao.getProduct(); // Obtiene todos los productos usando el DAO
-        return result; // Retorna el resultado
+        let result = await this.dao.getProduct();
+        return result;
     }
 
-    // Obtiene un producto por ID
     getProductById = async (id) => {
-        let result = await this.dao.getProductById(id); // Obtiene un producto por ID usando el DAO
-        return result; // Retorna el resultado
+        let result = await this.dao.getProductById(id);
+        return result;
     }
 
 
-    // Crea un nuevo producto
     createProduct = async (product) => {
-        let productToInsert = new ProductDTO(product); // Crea un DTO de producto
-        let result = await this.dao.createProduct(productToInsert); // Crea un nuevo producto usando el DAO
-        return result; // Retorna el resultado
+        let productToInsert = new ProductDTO(product);
+        let result = await this.dao.createProduct(productToInsert);
+        return result;
     }
 
 
-    // Actualiza un producto
     updateProduct = async (id,product) => {
-        let productToUpdate = new ProductDTO(product); // Crea un DTO de producto
-        let result = await this.dao.updateProduct(id, productToUpdate); // Actualiza un producto usando el DAO
-        return result; // Retorna el resultado
+        let productToUpdate = new ProductDTO(product);
+        let result = await this.dao.updateProduct(id, productToUpdate);
+        return result;
     }
 
-    // Elimina un producto
     deleteProduct = async (id) => {
-        let result = await this.dao.deleteProduct(id); // Elimina un producto usando el DAO
-        return result; // Retorna el resultado
+        let result = await this.dao.deleteProduct(id);
+        return result;
     }
 }

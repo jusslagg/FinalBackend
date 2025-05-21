@@ -1,30 +1,29 @@
-import mongoose from "mongoose"; // Importa mongoose
+import mongoose from "mongoose";
 
-const collection = "orders"; // Nombre de la colección
+const collection = "orders";
 
-// Esquema de la orden
 const orderSchema = new mongoose.Schema ({
 
-    user: { // Usuario que realiza la orden
-        type: mongoose.Schema.Types.ObjectId, // Tipo ObjectId para referenciar a la colección de usuarios
-        ref: 'users', // Referencia a la colección de usuarios
-        required: true // Es requerido
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+        required: true
     },
-    cart: { // Carrito asociado a la orden
-        type: mongoose.Schema.Types.ObjectId, // Tipo ObjectId para referenciar a la colección de carritos
-        ref: 'Carts', // Referencia a la colección de carritos
-        required: true // Es requerido
+    cart: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Carts',
+        required: true
     },
-    total:{ // Total de la orden
-        type: Number, // Tipo Number
-        required: true // Es requerido
+    total:{
+        type: Number,
+        required: true
     },
-    createdAt: { // Fecha de creación de la orden
-        type: Date, // Tipo Date
-        default: Date.now // Valor por defecto es la fecha actual
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
 
-const orderModel = mongoose.model(collection, orderSchema); // Crea el modelo de la orden
+const orderModel = mongoose.model(collection, orderSchema);
 
-export default orderModel; // Exporta el modelo de la orden
+export default orderModel;
