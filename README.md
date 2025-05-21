@@ -119,4 +119,4 @@ La API ofrece los siguientes endpoints:
 
 ## Autor
 
-[Tu Nombre]
+[Jesús Gil]
